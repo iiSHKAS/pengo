@@ -1,63 +1,84 @@
-# Pengo
+<div align="center">
+  <img src="ui/assets/pengo.svg" alt="Pengo" width="96" height="96">
+  <h1>Pengo</h1>
+  <p>Capture, annotate, and organize screenshots on Linux.</p>
+  <p><a href="README.ar.md">العربية</a> · <a href="https://github.com/iiSHKAS/pengo/releases">Releases</a> · <a href="https://github.com/iiSHKAS/pengo/issues">Report an issue</a></p>
+</div>
 
-Screenshot capture + library + editor. Tauri 2 (Rust) backend, plain HTML/CSS/JS frontend (no bundler).
+Pengo brings screen capture, an image library, and an annotation editor into one desktop application. Capture a region or window, add an explanation, and keep the result in a searchable library. The interface supports English and Arabic, including right-to-left layouts, with light and dark themes.
 
-```
-src-tauri/src/
-  lib.rs            commands, tray, shortcut, app state
-  settings.rs       persisted settings (JSON)
-  shortcuts.rs      shortcut lifecycle, dispatch, status and fallback selection
-  linux_shortcuts.rs GNOME gsettings + single-instance D-Bus relay (from Sonux)
-  input_shortcuts.rs opt-in evdev reader and keyboard permission setup (from Sonux)
-  library.rs        scan / thumbnails / rename
-  clipboard.rs      wl-copy -> xclip -> arboard
-  capture/
-    mod.rs          backend detection, save pipeline, X11 overlay flow
-    x11.rs          generic X11: root GetImage + EWMH window list (any distro / WM)
-    gnome.rs        GNOME Wayland: Shell extension over D-Bus
-ui/
-  index.html, css/  app shell, design tokens (dark/light, RTL-aware)
-  js/               gallery, viewer, editor, annotate (shared renderer), settings, i18n (en/ar)
-  overlay.html      X11 region/window picker over a frozen frame
-extension/          GNOME Shell extension (embedded into the binary, installed from Settings)
-```
+## Features
 
-## UI kit (one place per control)
-`ui/js/components.js` + `ui/css/components.css` hold every reusable control:
-`Select`, `openMenu`/`Menu`, `Switch`, `Segmented` (sliding pill), `toast`, `confirmDialog`, `promptDialog`,
-all built on one animated `Popover` (opens/closes with a fade+scale, flips up near the screen edge, closes on
-outside click / Esc, keyboard navigable). Colours, radius and speed come from tokens (`--pop-radius`, `--pop-dur`,
-the palette in `app.css`), so restyling a control means editing it once.
-```js
-import { Select, Segmented, Switch, openMenu } from './components.js';
-const sort = Select({ options: [{ value: 'a', label: 'A' }], value: 'a', onChange: v => {} });
-openMenu(button, [{ label: 'Save', icon: 'save', onClick }, 'sep', { label: 'Delete', danger: true, onClick }]);
-```
+- **Capture:** select a region or window on X11 and GNOME Wayland. GNOME also supports instant capture of the window or screen under the pointer.
+- **Annotate:** add text, arrows, shapes, numbered steps, freehand drawings, and highlights. Crop images or use blur and pixelation tools.
+- **Organize:** browse thumbnails, search, sort, mark favorites, rename images, and open their location in the file manager.
+- **Save and copy:** choose PNG, JPG, WebP, or BMP, adjust JPEG quality, and copy images to the clipboard.
+- **Work in the background:** configure global shortcuts, launch at login, or keep Pengo in the system tray when a tray is available.
+- **Stay updated:** the AppImage edition can download and install signed updates while the current session remains open. Restart when you are ready.
 
-## Capture backends
-| Session | Backend | Hotkey |
+## Desktop support
+
+| Session | Screen capture | Global shortcuts |
 |---|---|---|
-| X11 (any desktop) | `x11rb` root grab + overlay window | Tauri global-shortcut |
-| GNOME / Wayland | WinProbe Shell extension (frozen frame + annotations in the Shell) | GNOME custom keybinding |
-| Other Wayland | not yet (library + editor still work) | opt-in evdev (delivery only) |
+| X11 | Supported through the X11 capture backend | Native shortcut registration |
+| GNOME Wayland | Supported through the included WinProbe Shell extension | GNOME custom keybindings |
+| Other Wayland desktops | Not supported yet; the library and editor remain available | Optional evdev input fallback |
 
-Adding a compositor = a new module under `capture/` + a `Backend` variant.
+The **evdev fallback changes how shortcuts are received**. It does not add screen capture support to another Wayland compositor. It requires explicit consent and may request administrator authorization for keyboard access. See the [shortcut guide](docs/shortcut-fallback.md).
 
-## Build / run
-Needs `webkit2gtk-4.1`, `gtk3`, `libsoup3` dev packages and Rust.
+## Run the AppImage
+
+Download `Pengo.AppImage` from a published [GitHub release](https://github.com/iiSHKAS/pengo/releases), then run:
+
+```sh
+chmod +x Pengo.AppImage
+./Pengo.AppImage
 ```
-cd src-tauri && cargo run            # dev
-scripts/install.sh                   # release build + install to ~/.local
-pengo --capture                    # trigger a capture from another process
+
+On **GNOME Wayland**, open Settings and install the capture extension. A newly installed extension may require signing out and back in once. The capture engine status in Settings shows whether the extension is available.
+
+### Default shortcuts
+
+| Shortcut | Action | Availability |
+|---|---|---|
+| `Ctrl+Shift+E` | Open capture selection | X11 and GNOME Wayland |
+| `Ctrl+Alt+W` | Capture the window under the pointer | GNOME Wayland |
+| `Ctrl+Alt+S` | Capture the screen under the pointer | GNOME Wayland |
+
+Change these bindings in **Settings → Shortcut**. You can also start a capture from the application or its tray menu.
+
+## Updates
+
+Automatic updates are enabled by default for the AppImage edition. Pengo checks after 30 seconds and then every six hours while running. It verifies the downloaded artifact's signature and signed version, preserves a `.previous` recovery copy, and replaces the AppImage file.
+
+Pengo does **not restart automatically**. Use the restart button or reopen the application later. Disable automatic updates or run a manual check from Settings. Development builds and ordinary executable installations do not self-update.
+
+See the [AppImage update and release guide](docs/updates.md) for signing, release preparation, and recovery details. Release names and GitHub tags use numeric versions such as `0.1.0`, without a `v` prefix.
+
+## Build from source
+
+The desktop application uses **Rust and Tauri 2**, with a plain HTML, CSS, and JavaScript frontend. There is no frontend bundling step.
+
+Install Rust and the Linux Tauri build dependencies, then run these commands separately:
+
+```sh
+git clone https://github.com/iiSHKAS/pengo.git Pengo
+cd Pengo
+cargo run --manifest-path src-tauri/Cargo.toml
 ```
-Debug builds: `PENGO_DEV_EVAL=<dir>` runs `<dir>/eval.js` inside the main webview (handy for scripted UI tests).
 
-See [global shortcut fallback](docs/shortcut-fallback.md) for consent, permissions, tests and Sonux source attribution.
+Node.js 22 and `npm ci` are needed for the JavaScript tests and AppImage release tooling. The [development guide](docs/development.md) covers dependencies, checks, installation, and the source layout. The [release guide](docs/updates.md) covers signed AppImage builds.
 
-## AppImage updates
+## Documentation
 
-Pengo uses Sonux's signed AppImage update flow: automatic checks after 30 seconds
-and every six hours, verified downloads, atomic replacement with a `.previous`
-recovery copy, and explicit restart. See [setup, keys, builds and releases](docs/updates.md).
-The GitHub workflow publishes `Pengo.AppImage`, its version-bound signature,
-`latest.json`, and checksums to `iiSHKAS/pengo`. Development binaries do not self-update.
+- [دليل المستخدم بالعربية](README.ar.md)
+- [Development and testing](docs/development.md)
+- [Global shortcuts and evdev permissions](docs/shortcut-fallback.md)
+- [تحديثات AppImage والبناء والنشر](docs/updates.md)
+- [Changelog](CHANGELOG.md)
+
+## Credits and licensing
+
+Pengo's GNOME shortcut integration, evdev fallback, and AppImage update flow include code adapted from **Sonux / Mixweave**. The capture extension retains its WinProbe identity for compatibility.
+
+The copied Sonux / Mixweave components are licensed under **GPL-3.0-only**. Their license is preserved in [licenses/Sonux-GPL-3.0.txt](licenses/Sonux-GPL-3.0.txt); dependency licenses remain with their respective projects.

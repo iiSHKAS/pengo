@@ -1,5 +1,7 @@
 # Global shortcuts
 
+[Project overview](../README.md) · [Development guide](development.md)
+
 The native paths are X11 (Tauri global shortcut) and GNOME Wayland
 (gsettings custom keybindings, MediaKeys service, direct single-instance D-Bus
 relay with a quoted executable cold-start fallback), ported from Sonux.
@@ -38,7 +40,7 @@ ACLs or already-open device handles.
 
 - `cargo test --manifest-path src-tauri/Cargo.toml --lib`
 - `node --experimental-vm-modules scripts/test-shortcut-fallback.cjs`
-  (requires jsdom available through Node module resolution / NODE_PATH)
+  (run `npm ci` first to install jsdom)
 - Optional real-device test: `cargo test --manifest-path src-tauri/Cargo.toml --lib real_evdev_dispatch_and_shutdown -- --ignored --nocapture`
   requires writable `/dev/uinput` and readable keyboard events. It creates and
   removes a virtual keyboard and does not change system permissions.
@@ -57,4 +59,4 @@ The simulation flag is ignored in release builds.
 adapted from Sonux / Mixweave's corresponding command modules. The fallback UI
 flow is adapted from its shortcutFallback store and ShortcutFallbackModal.
 Sonux / Mixweave identifies its license as GPL-3.0-only; the original license is
-preserved at `licenses/Sonux-GPL-3.0.txt`.
+preserved in the [license file](../licenses/Sonux-GPL-3.0.txt).

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Screenshot app that plays a notification sound when a screenshot is taken.
+"""Pengo legacy Python prototype with capture notification sounds.
+
+The current desktop application is built from src-tauri/ and ui/.
 
 Requirements:  pip install pillow      (and paplay or ffplay for sound)
-Run:           python3 screenshot_app.py
+Run:           python3 pengo.py
 """
 import math
 import os
@@ -148,7 +150,7 @@ def play(path):
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Screenshot App")
+        self.title("Pengo")
         self.resizable(False, False)
         self.custom_sound = ""
         pad = {"padx": 10, "pady": 6}
