@@ -1,0 +1,14 @@
+target/
+src-tauri/gen/
+.dev/
+node_modules/
+update-build.json
+release-files/
+upload/
+*.key
+*.password
+.env
+.env.*
+github-files-update/
+__pycache__/
+*.py[cod]

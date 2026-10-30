@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pengo</title>
+  <link rel="icon" href="assets/pengo.png">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/updates.css">
+</head>
+<body>
+  <div class="window">
+  <div id="titlebar" class="titlebar" data-tauri-drag-region></div>
+  <div id="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main">
+      <div id="update-banner" class="update-banner" role="status" aria-live="polite" hidden></div>
+      <div class="view-stack">
+      <section class="view" id="view-library"></section>
+      <section class="view" id="view-settings" hidden></section>
+      <section class="view" id="view-editor" hidden></section>
+      </div>
+    </main>
+  </div>
+  <div id="viewer" class="viewer" hidden></div>
+  <div id="modal-root"></div>
+  <div id="popover-root"></div>
+  <div id="toasts" class="toasts"></div>
+  </div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

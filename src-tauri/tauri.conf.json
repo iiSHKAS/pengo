@@ -1,0 +1,60 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Pengo",
+  "version": "0.1.0",
+  "identifier": "dev.sonux.pengo",
+  "build": {
+    "frontendDist": "../ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Pengo",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 920,
+        "minHeight": 600,
+        "center": true,
+        "decorations": false,
+        "visible": false,
+        "transparent": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: http://asset.localhost blob: data:; style-src 'self' 'unsafe-inline'; connect-src 'self' ipc: http://ipc.localhost asset: http://asset.localhost; font-src 'self' data:",
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "allow": [
+            "**"
+          ],
+          "requireLiteralLeadingDot": false
+        }
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "appimage"
+    ],
+    "category": "Utility",
+    "shortDescription": "Screenshot capture, library and editor",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/icon.png"
+    ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI4MTBCNjU4REYxOUNBOTgKUldTWXlobmZXTFlRS0EzMUFNS0hOaklybFBGdWhGN1FTTnQ3dFBWdC8wY0plQk1xZnhpWnBXeUEK",
+      "endpoints": [
+        "https://github.com/iiSHKAS/pengo/releases/latest/download/latest.json"
+      ],
+      "requireSignedVersion": true
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "uuid": "winprobe@sonux.dev",
+  "name": "WinProbe",
+  "description": "Window/region picker backend for Pengo: pointer, window geometry, selection overlay.",
+  "shell-version": ["45", "46", "47", "48", "49"]
+}

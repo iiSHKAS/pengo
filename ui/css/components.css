@@ -1,0 +1,87 @@
+/* Pengo UI kit - the look of every control in js/components.js.
+   Tune the whole app from here (+ the tokens at the top of app.css). */
+:root {
+  --pop-radius: 14px;
+  --pop-dur: .15s;           /* keep OUT_MS in components.js >= this */
+  --item-h: 36px;
+}
+
+/* ---------- Popover (shared by Select and Menu) ---------- */
+#popover-root { position: fixed; inset: 0; z-index: 90; pointer-events: none; }
+.popover {
+  position: fixed; pointer-events: none; overflow-y: auto; max-width: min(360px, calc(100vw - 16px));
+  opacity: 0; transform: translateY(var(--dy, -6px)) scale(.96); transform-origin: var(--origin, top left);
+  transition: opacity var(--pop-dur) ease, transform .2s var(--ease);
+}
+.popover.open { opacity: 1; transform: none; pointer-events: auto; }
+.pop-panel {
+  min-width: 180px; padding: 6px; border-radius: var(--pop-radius);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong); box-shadow: var(--shadow);
+}
+.pop-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--item-h); padding: 0 11px; border-radius: 9px;
+  text-align: start; font-weight: 580; color: var(--text); transition: background .12s, color .12s;
+}
+.pop-item:hover, .pop-item:focus-visible { background: var(--surface-3); outline: 0; }
+.pop-item.selected { color: var(--accent); }
+.pop-item.danger { color: var(--danger); }
+.pop-item.danger:hover { background: rgba(255, 93, 108, .12); }
+.pop-item[disabled] { opacity: .4; pointer-events: none; }
+.pop-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pop-check { margin-inline-start: auto; opacity: 0; transform: scale(.6); transition: opacity .15s, transform .2s var(--ease); }
+.pop-item.selected .pop-check, .pop-item .pop-check:only-child { opacity: 1; transform: none; }
+.pop-sep { height: 1px; margin: 5px 4px; background: var(--border); }
+
+/* ---------- Select ---------- */
+.select-btn {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 150px; height: 38px; padding: 0 11px 0 14px;
+  border-radius: 11px; background: var(--surface); border: 1px solid var(--border); font-weight: 580;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.select-btn:hover { border-color: var(--border-strong); background: var(--surface-2); }
+.select-btn:focus-visible, .select-btn[aria-expanded="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); outline: 0; }
+.select-caret { color: var(--text-3); transition: transform .22s var(--ease); }
+.select-btn[aria-expanded="true"] .select-caret { transform: rotate(180deg); }
+
+/* ---------- Switch ---------- */
+.switch { position: relative; width: 44px; height: 26px; flex: none; }
+.switch input { opacity: 0; position: absolute; inset: 0; margin: 0; cursor: pointer; z-index: 1; }
+.switch span { position: absolute; inset: 0; border-radius: 99px; background: var(--surface-3); border: 1px solid var(--border-strong); transition: background .2s; }
+.switch span::after { content: ""; position: absolute; top: 3px; inset-inline-start: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .24s var(--ease); box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+.switch input:checked + span { background: var(--accent); border-color: transparent; }
+.switch input:checked + span::after { transform: translateX(18px); }
+:root[dir="rtl"] .switch input:checked + span::after { transform: translateX(-18px); }
+.switch input:focus-visible + span { box-shadow: 0 0 0 3px var(--accent-soft); }
+
+/* ---------- Segmented ---------- */
+.seg { position: relative; display: inline-flex; padding: 3px; border-radius: 11px; background: var(--surface-2); border: 1px solid var(--border); direction: ltr; }
+.seg.fill { display: flex; }
+.seg.fill button { flex: 1; }
+.seg button { position: relative; z-index: 1; height: 30px; padding: 0 13px; border-radius: 8px; color: var(--text-2); font-weight: 580; font-size: 13px; transition: color .15s; white-space: nowrap; }
+.seg button:hover { color: var(--text); }
+.seg button.on { color: var(--text); }
+.seg-pill { position: absolute; top: 3px; bottom: 3px; left: 3px; border-radius: 8px; background: var(--surface-3); box-shadow: 0 1px 4px rgba(0,0,0,.25); transition: transform .26s var(--ease), width .26s var(--ease); pointer-events: none; }
+:root[dir="rtl"] .seg { direction: rtl; }
+
+/* ---------- Toast & dialogs (animated in and out) ---------- */
+.toast { opacity: 0; transform: translateY(10px) scale(.97); transition: opacity var(--pop-dur) ease, transform .25s var(--ease); animation: none; }
+.toast.in { opacity: 1; transform: none; }
+.modal-back { opacity: 0; animation: none; transition: opacity var(--pop-dur) ease; }
+.modal-back.in { opacity: 1; }
+.modal { transform: translateY(8px) scale(.95); animation: none; transition: transform .24s var(--ease); }
+.modal-back.in .modal { transform: none; }
+
+/* A setting that depends on the one above it: indented with a guide line, greyed out while that one is off. */
+.row.sub { position: relative; padding-inline-start: 36px; }
+.row.sub::before { content: ""; position: absolute; inset-inline-start: 20px; top: 0; bottom: 50%; width: 10px; border-inline-start: 2px solid var(--border-strong); border-bottom: 2px solid var(--border-strong); border-end-start-radius: 8px; }
+.row.is-disabled .row-text, .switch.disabled { opacity: .45; }
+.switch.disabled input { cursor: not-allowed; }
+
+.shortcut-fallback-modal { width: min(560px, calc(100vw - 40px)); max-height: calc(100vh - 64px); overflow-y: auto; }
+.shortcut-fallback-modal p { line-height: 1.65; white-space: normal; }
+.fallback-permission { padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+.fallback-permission p { margin-bottom: 0; }
+.shortcut-fallback-modal summary { cursor: pointer; color: var(--text-2); }
+.fallback-error, .fallback-warning { color: var(--warn); overflow-wrap: anywhere; }
+.fallback-error:empty { display: none; }

@@ -1,0 +1,8 @@
+html, body { margin: 0; height: 100%; overflow: hidden; background: #000; cursor: crosshair; user-select: none; font: 13px/1.4 system-ui, "Noto Sans Arabic", sans-serif; }
+#frozen { position: fixed; left: 0; top: 0; pointer-events: none; image-rendering: auto; }
+.dim { position: fixed; background: rgba(0, 0, 0, .5); pointer-events: none; }
+.sel { position: fixed; pointer-events: none; box-shadow: 0 0 0 1px rgba(255,255,255,.9), 0 0 0 2px rgba(0,0,0,.55); background: transparent; }
+.sel.win { background: transparent; }
+.tag { position: absolute; left: 0; top: -26px; white-space: nowrap; padding: 3px 9px; border-radius: 7px; color: #fff; font-weight: 650; background: rgba(15,16,22,.88); }
+.sel.bottom .tag { top: auto; bottom: -26px; }
+.hint { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); padding: 8px 16px; border-radius: 12px; color: #fff; font-weight: 600; background: rgba(15,16,22,.85); border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(10px); pointer-events: none; transition: opacity .3s; }
