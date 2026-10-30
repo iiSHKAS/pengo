@@ -42,8 +42,8 @@ On **GNOME Wayland**, open Settings and install the capture extension. A newly i
 | Shortcut | Action | Availability |
 |---|---|---|
 | `Ctrl+Shift+E` | Open capture selection | X11 and GNOME Wayland |
-| `Ctrl+Alt+W` | Capture the window under the pointer | X11 and GNOME Wayland |
-| `Ctrl+Alt+S` | Capture the screen under the pointer | X11 and GNOME Wayland |
+| `Ctrl+Alt+W` | Capture the window under the pointer | GNOME Wayland; X11 supported (not yet tested) |
+| `Ctrl+Alt+S` | Capture the screen under the pointer | GNOME Wayland; X11 supported (not yet tested) |
 
 Change these bindings in **Settings → Shortcut**. You can also start a capture from the application or its tray menu.
 
