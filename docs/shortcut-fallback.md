@@ -17,7 +17,10 @@ new devices are scanned every three seconds. Repeated keydown events are ignored
 
 The fallback only changes shortcut delivery. Capture still requires X11 or the
 WinProbe GNOME extension. Other Wayland compositors still have no capture backend.
-Window/screen instant shortcuts remain GNOME-specific, as before.
+Window and screen instant shortcuts work on X11 and GNOME Wayland. On X11,
+window capture crops the visible desktop rectangle, so overlapping content remains
+visible. Screen capture selects the monitor under the pointer through RandR,
+falling back to the root screen if monitor information is unavailable.
 
 ## Permission
 

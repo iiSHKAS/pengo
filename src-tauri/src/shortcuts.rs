@@ -57,7 +57,7 @@ pub fn bindings(settings: &Settings, backend: capture::Backend) -> HashMap<Strin
         ("window", &settings.shortcut_window),
         ("screen", &settings.shortcut_screen),
     ] {
-        if !shortcut.is_empty() && (action == "region" || backend == capture::Backend::Gnome) {
+        if !shortcut.is_empty() && (action == "region" || backend != capture::Backend::Unsupported) {
             bindings.insert(action.into(), crate::x11_accel(shortcut));
         }
     }
@@ -159,8 +159,8 @@ pub fn dispatch(app: &AppHandle, action: &str, input: bool) {
         }
         match action.as_str() {
             "region" => capture::start(&app),
-            "window" | "screen" if app.state::<AppState>().backend == capture::Backend::Gnome => {
-                capture::gnome::capture_mode(&app, &action)
+            "window" | "screen" => {
+                capture::capture_mode(&app, &action)
             }
             _ => {}
         }

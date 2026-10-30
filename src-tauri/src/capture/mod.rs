@@ -115,6 +115,29 @@ pub fn start(app: &AppHandle) {
     }
 }
 
+/// Instant capture runs on the shortcut worker, without changing focus first.
+pub fn capture_mode(app: &AppHandle, action: &str) {
+    match app.state::<AppState>().backend {
+        Backend::Gnome => gnome::capture_mode(app, action),
+        Backend::X11 => {
+            // Serialize quick captures and ignore them while selection is open.
+            static BUSY: std::sync::Mutex<()> = std::sync::Mutex::new(());
+            let Ok(_guard) = BUSY.try_lock() else { return };
+            if app.get_webview_window("overlay").is_some() { return; }
+            let result = x11::grab_mode(action).and_then(|capture| {
+                if let Some((image, label)) = capture {
+                    save_rgba(app, &image, &label)?;
+                }
+                Ok(())
+            });
+            if let Err(error) = result {
+                log(app, format!("capture failed: {error}"));
+            }
+        }
+        Backend::Unsupported => {}
+    }
+}
+
 // ------------------------------------------------------------- save pipeline
 
 /// Canonical lower-case extension for a format name ("jpeg" -> "jpg"; unknown -> "png").

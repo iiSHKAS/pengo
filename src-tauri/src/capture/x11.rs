@@ -4,7 +4,8 @@
 use image::RgbaImage;
 use serde::Serialize;
 use x11rb::connection::Connection;
-use x11rb::protocol::xproto::{Atom, AtomEnum, ConnectionExt, ImageFormat, Window};
+use x11rb::protocol::randr::ConnectionExt as _;
+use x11rb::protocol::xproto::{Atom, AtomEnum, ConnectionExt, ImageFormat, MapState, Window};
 use x11rb::rust_connection::RustConnection;
 
 #[derive(Serialize, Clone, Debug)]
@@ -63,6 +64,10 @@ fn prop8(conn: &RustConnection, win: Window, prop: Atom) -> Vec<u8> {
 
 pub fn grab() -> Result<Frozen, String> {
     let (conn, num) = RustConnection::connect(None).map_err(|e| format!("cannot open the X display: {e}"))?;
+    grab_on(&conn, num)
+}
+
+fn grab_on(conn: &RustConnection, num: usize) -> Result<Frozen, String> {
     let setup = conn.setup();
     let screen = &setup.roots[num];
     let root = screen.root;
@@ -101,6 +106,55 @@ pub fn grab() -> Result<Frozen, String> {
     Ok(Frozen { img, windows })
 }
 
+/// Snapshot the target before any application window is raised or hidden.
+/// Window captures crop the visible desktop, including any overlapping content.
+pub fn grab_mode(action: &str) -> Result<Option<(RgbaImage, String)>, String> {
+    let (conn, num) = RustConnection::connect(None).map_err(|e| e.to_string())?;
+    let root = conn.setup().roots[num].root;
+    let pointer = conn.query_pointer(root).map_err(|e| e.to_string())?
+        .reply().map_err(|e| e.to_string())?;
+    if !pointer.same_screen {
+        return Err("pointer is on another X screen".into());
+    }
+    let (px, py) = (i32::from(pointer.root_x), i32::from(pointer.root_y));
+    let contains = |x: i32, y: i32, w: i32, h: i32| {
+        px >= x && py >= y && px < x + w && py < y + h
+    };
+    let frozen = grab_on(&conn, num)?;
+    let (x, y, w, h, label) = match action {
+        "window" => {
+            let Some(win) = frozen.windows.iter().find(|w| contains(w.x, w.y, w.w, w.h)) else {
+                return Ok(None);
+            };
+            (win.x, win.y, win.w, win.h,
+                if win.app.is_empty() { "window".into() } else { win.app.clone() })
+        }
+        "screen" => {
+            // RandR 1.5 reports logical monitors, including tiled displays.
+            // Older servers expose the active output rectangles through CRTCs.
+            let monitor = conn.randr_get_monitors(root, true).ok()
+                .and_then(|c| c.reply().ok())
+                .and_then(|r| r.monitors.into_iter().find_map(|m| {
+                    let rect = (i32::from(m.x), i32::from(m.y), i32::from(m.width), i32::from(m.height));
+                    contains(rect.0, rect.1, rect.2, rect.3).then_some(rect)
+                }));
+            let monitor = monitor.or_else(|| {
+                let resources = conn.randr_get_screen_resources_current(root).ok()?.reply().ok()?;
+                resources.crtcs.into_iter().find_map(|crtc| {
+                    let r = conn.randr_get_crtc_info(crtc, resources.config_timestamp).ok()?.reply().ok()?;
+                    let rect = (i32::from(r.x), i32::from(r.y), i32::from(r.width), i32::from(r.height));
+                    contains(rect.0, rect.1, rect.2, rect.3).then_some(rect)
+                })
+            });
+            let (x, y, w, h) = monitor.unwrap_or((0, 0, frozen.img.width() as i32, frozen.img.height() as i32));
+            (x, y, w, h, "screen".into())
+        }
+        _ => return Err("unknown capture mode".into()),
+    };
+    let image = frozen.crop(x.into(), y.into(), w.into(), h.into()).ok_or("empty capture target")?;
+    Ok(Some((image, label)))
+}
+
 fn windows(conn: &RustConnection, root: Window, sw: i32, sh: i32) -> Result<Vec<WinRect>, String> {
     let a_list = atom(conn, "_NET_CLIENT_LIST_STACKING")?;
     let a_state = atom(conn, "_NET_WM_STATE")?;
@@ -116,7 +170,16 @@ fn windows(conn: &RustConnection, root: Window, sw: i32, sh: i32) -> Result<Vec<
 
     let current = prop32(conn, root, a_cur).first().copied();
     let mut out = Vec::new();
-    for win in prop32(conn, root, a_list).into_iter().rev() {
+    let mut clients = prop32(conn, root, a_list);
+    if clients.is_empty() {
+        // Basic WMs may not publish EWMH client lists. Root children are also
+        // returned in bottom-to-top stacking order and include their frames.
+        clients = conn.query_tree(root).map_err(|e| e.to_string())?
+            .reply().map_err(|e| e.to_string())?.children;
+    }
+    for win in clients.into_iter().rev() {
+        let Some(attrs) = conn.get_window_attributes(win).ok().and_then(|c| c.reply().ok()) else { continue };
+        if attrs.map_state != MapState::VIEWABLE { continue; }
         if prop32(conn, win, a_state).contains(&a_hidden) || prop32(conn, win, a_type).contains(&a_desktop_t) {
             continue;
         }

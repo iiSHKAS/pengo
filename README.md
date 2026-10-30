@@ -9,7 +9,7 @@ Pengo brings screen capture, an image library, and an annotation editor into one
 
 ## Features
 
-- **Capture:** select a region or window on X11 and GNOME Wayland. GNOME also supports instant capture of the window or screen under the pointer.
+- **Capture:** select a region or window on X11 and GNOME Wayland. Both backends also support instant capture of the window or screen under the pointer.
 - **Annotate:** add text, arrows, shapes, numbered steps, freehand drawings, and highlights. Crop images or use blur and pixelation tools.
 - **Organize:** browse thumbnails, search, sort, mark favorites, rename images, and open their location in the file manager.
 - **Save and copy:** choose PNG, JPG, WebP, or BMP, adjust JPEG quality, and copy images to the clipboard.
@@ -42,8 +42,8 @@ On **GNOME Wayland**, open Settings and install the capture extension. A newly i
 | Shortcut | Action | Availability |
 |---|---|---|
 | `Ctrl+Shift+E` | Open capture selection | X11 and GNOME Wayland |
-| `Ctrl+Alt+W` | Capture the window under the pointer | GNOME Wayland |
-| `Ctrl+Alt+S` | Capture the screen under the pointer | GNOME Wayland |
+| `Ctrl+Alt+W` | Capture the window under the pointer | X11 and GNOME Wayland |
+| `Ctrl+Alt+S` | Capture the screen under the pointer | X11 and GNOME Wayland |
 
 Change these bindings in **Settings → Shortcut**. You can also start a capture from the application or its tray menu.
 

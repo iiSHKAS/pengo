@@ -22,7 +22,7 @@ chrono = "0.4"
 dirs = "5"
 regex = "1"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "bmp", "webp"] }
-x11rb = "0.13"
+x11rb = { version = "0.13", features = ["randr"] }
 zbus = "5"
 arboard = "3"
 evdev = "0.13.2"
