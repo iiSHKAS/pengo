@@ -2,7 +2,7 @@
   <img src="ui/assets/pengo.svg" alt="Pengo" width="96" height="96">
   <h1>Pengo</h1>
   <p>Capture, annotate, and organize screenshots on Linux.</p>
-  <p><a href="README.ar.md">العربية</a> · <a href="https://github.com/iiSHKAS/pengo/releases">Releases</a> · <a href="https://github.com/iiSHKAS/pengo/issues">Report an issue</a></p>
+  <p><a href="https://github.com/iiSHKAS/pengo/releases">Releases</a> · <a href="https://github.com/iiSHKAS/pengo/issues">Report an issue</a></p>
 </div>
 
 Pengo brings screen capture, an image library, and an annotation editor into one desktop application. Capture a region or window, add an explanation, and keep the result in a searchable library. The interface supports English and Arabic, including right-to-left layouts, with light and dark themes.
@@ -67,14 +67,13 @@ cd Pengo
 cargo run --manifest-path src-tauri/Cargo.toml
 ```
 
-Node.js 22 and `npm ci` are needed for the JavaScript tests and AppImage release tooling. The [development guide](docs/development.md) covers dependencies, checks, installation, and the source layout. The [release guide](docs/updates.md) covers signed AppImage builds.
+Node.js 22 and `npm ci` are needed for AppImage release tooling. The [development guide](docs/development.md) covers dependencies, checks, installation, and the source layout. The [release guide](docs/updates.md) covers signed AppImage builds.
 
 ## Documentation
 
-- [دليل المستخدم بالعربية](README.ar.md)
-- [Development and testing](docs/development.md)
+- [Development guide](docs/development.md)
 - [Global shortcuts and evdev permissions](docs/shortcut-fallback.md)
-- [تحديثات AppImage والبناء والنشر](docs/updates.md)
+- [AppImage updates, builds, and releases](docs/updates.md)
 - [Changelog](CHANGELOG.md)
 
 ## Credits and licensing

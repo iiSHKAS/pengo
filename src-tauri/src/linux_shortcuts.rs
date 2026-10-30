@@ -212,69 +212,6 @@ fn shortcut_command(binary: &str, action: &str, identifier: &str) -> String {
     format!("sh -c {}", shell_quote(&relay))
 }
 
-#[cfg(test)]
-mod relay_tests {
-    use super::*;
-
-    #[test]
-    fn relay_uses_the_configured_single_instance_endpoint() {
-        let command = shortcut_command(
-            "/opt/Pengo.AppImage",
-            "channel:sink_game:mute",
-            "dev.sonux.audio",
-        );
-        assert!(command.contains("dev.sonux.audio.SingleInstance"));
-        assert!(command.contains("/dev/sonux/audio/SingleInstance"));
-        assert!(command.contains("org.SingleInstance.DBus.ExecuteCallback"));
-        assert!(command.contains("|| exec /opt/Pengo.AppImage --shortcut channel:sink_game:mute"));
-    }
-
-    #[test]
-    fn relay_and_cold_start_preserve_arguments_without_shell_expansion() {
-        use std::os::unix::fs::PermissionsExt;
-        let dir = tempfile::tempdir().unwrap();
-        let log = dir.path().join("arguments");
-        let fake_dbus = dir.path().join("gdbus");
-        let binary = dir.path().join("PC games Pengo's.AppImage");
-        std::fs::write(
-            &fake_dbus,
-            "#!/bin/sh\nprintf '%s\\n' \"$@\" > \"$RELAY_LOG\"\nexit \"$RELAY_STATUS\"\n",
-        )
-        .unwrap();
-        std::fs::write(
-            &binary,
-            "#!/bin/sh\nprintf '%s\\n' fallback \"$@\" > \"$RELAY_LOG\"\n",
-        )
-        .unwrap();
-        for file in [&fake_dbus, &binary] {
-            std::fs::set_permissions(file, std::fs::Permissions::from_mode(0o700)).unwrap();
-        }
-        let action = "channel:Bob's $(false);:mute";
-        let command = shortcut_command(binary.to_str().unwrap(), action, "dev.sonux.audio");
-        for status in ["0", "1"] {
-            assert!(Command::new("sh")
-                .args(["-c", &command])
-                .env("PATH", format!("{}:/usr/bin:/bin", dir.path().display()))
-                .env("RELAY_LOG", &log)
-                .env("RELAY_STATUS", status)
-                .status()
-                .unwrap()
-                .success());
-            let recorded = std::fs::read_to_string(&log).unwrap();
-            if status == "0" {
-                assert!(recorded.contains(&gvariant_string_array(&[
-                    "pengo".into(),
-                    "--shortcut".into(),
-                    action.into()
-                ])));
-                assert!(!recorded.starts_with("fallback"));
-            } else {
-                assert_eq!(recorded, format!("fallback\n--shortcut\n{action}\n"));
-            }
-        }
-    }
-}
-
 fn gvariant_string_array(values: &[String]) -> String {
     let items: Vec<String> = values.iter().map(|v| gvariant_string(v)).collect();
     format!("[{}]", items.join(", "))

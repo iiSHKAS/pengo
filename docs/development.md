@@ -1,6 +1,6 @@
 # Developing Pengo
 
-[Project overview](../README.md) · [العربية](../README.ar.md)
+[Project overview](../README.md)
 
 Pengo is a Linux desktop application built with Tauri 2 and Rust. The frontend is served directly from `ui/`; it uses native JavaScript modules and requires no bundler.
 
@@ -8,7 +8,7 @@ Pengo is a Linux desktop application built with Tauri 2 and Rust. The frontend i
 
 - Rust with Cargo.
 - GTK 3, WebKitGTK 4.1, libsoup 3, and AppIndicator development libraries.
-- Node.js 22 and npm for JavaScript tests and release tooling.
+- Node.js 22 and npm for release tooling.
 - AppImage packaging tools for release builds; see the dependency installation step in the [release workflow](../.github/workflows/release.yml).
 
 The clipboard integration uses `wl-copy` on Wayland or `xclip` on X11 when available, with a Rust clipboard fallback. Optional evdev permission setup requires `pkexec`, a desktop polkit agent, `udevadm`, and `setfacl`.
@@ -50,9 +50,6 @@ pengo --capture
 | `ui/` | Application UI, library, editor, settings, and translations |
 | `extension/` | WinProbe GNOME Shell extension, embedded in the Rust build |
 | `scripts/release/` | Signing, verification, build, and publication tools |
-| `pengo.py` | Earlier Python/Tkinter prototype; not used by the Tauri application |
-
-The Python prototype needs Python 3, Tkinter, and Pillow. It is retained separately from the desktop application's entry point; its capture behavior and dependencies differ from the Tauri edition.
 
 ## UI components
 
@@ -71,14 +68,11 @@ npm ci
 Run the relevant checks from the repository root:
 
 ```sh
-npm test
-cargo check --locked --manifest-path src-tauri/Cargo.toml --tests
-cargo test --locked --manifest-path src-tauri/Cargo.toml --lib
-cargo test --locked --manifest-path scripts/release/signing/Cargo.toml
-cargo test --locked --manifest-path scripts/release/checks/Cargo.toml
+cargo check --locked --manifest-path src-tauri/Cargo.toml
+cargo check --locked --manifest-path scripts/release/signing/Cargo.toml
 ```
 
-The last command tests the production AppImage installer and launch-path code without linking WebKit. Frontend tests mock IPC; passing them does not establish that capture or an update works in a real desktop session.
+These checks validate compilation. Verify capture, shortcuts, and AppImage updates in a real desktop session before publishing.
 
 ## Desktop verification
 

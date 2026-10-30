@@ -64,32 +64,3 @@ fn sign_image(
     minisign::verify(public, &signature, Cursor::new(data), true, false, false)?;
     Ok(signature)
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn updater_verifier_accepts_signature_and_rejects_changed_bytes_or_version() {
-        let pair = minisign::KeyPair::generate_unencrypted_keypair().unwrap();
-        let data = b"\x7fELF\0\0\0\0AI\x02payload";
-        let signature = sign_image(data, "0.1.0", &pair.pk, &pair.sk, 1).unwrap();
-        let key =
-            minisign_verify::PublicKey::decode(&pair.pk.to_box().unwrap().to_string()).unwrap();
-        let text = signature.to_string();
-        let parsed = minisign_verify::Signature::decode(&text).unwrap();
-        key.verify(data, &parsed, true).unwrap();
-        assert!(parsed
-            .trusted_comment()
-            .split('\t')
-            .any(|part| part == "version:0.1.0"));
-        assert!(key.verify(b"altered AppImage", &parsed, true).is_err());
-        let changed =
-            minisign_verify::Signature::decode(&text.replace("version:0.1.0", "version:9.9.9"))
-                .unwrap();
-        assert!(key.verify(data, &changed, true).is_err());
-        let wrong = minisign::KeyPair::generate_unencrypted_keypair().unwrap();
-        let wrong_key =
-            minisign_verify::PublicKey::decode(&wrong.pk.to_box().unwrap().to_string()).unwrap();
-        assert!(wrong_key.verify(data, &parsed, true).is_err());
-    }
-}

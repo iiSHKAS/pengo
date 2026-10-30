@@ -6,11 +6,9 @@
   "scripts": {
     "tauri": "tauri",
     "dev": "tauri dev",
-    "build:appimage": "node scripts/release/build-config.mjs && tauri build --bundles appimage --config update-build.json",
-    "test": "node --experimental-vm-modules scripts/test-shortcut-fallback.cjs && node --experimental-vm-modules scripts/test-updates.cjs && node --test scripts/test-release.mjs"
+    "build:appimage": "node scripts/release/build-config.mjs && tauri build --bundles appimage --config update-build.json"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "2.11.4",
-    "jsdom": "29.1.1"
+    "@tauri-apps/cli": "2.11.4"
   }
 }

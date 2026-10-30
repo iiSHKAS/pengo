@@ -9,6 +9,3 @@ publish = false
 [dependencies]
 minisign = "0.8"
 base64 = "0.22"
-
-[dev-dependencies]
-minisign-verify = "0.2.5"

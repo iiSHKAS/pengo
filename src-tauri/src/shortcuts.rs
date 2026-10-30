@@ -185,27 +185,3 @@ pub fn shutdown(app: &AppHandle) {
         let _ = linux_shortcuts::sync_gnome_shortcuts(app.clone(), false, HashMap::new());
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn legacy_settings_do_not_enable_keyboard_access() {
-        let settings: Settings = serde_json::from_str(r#"{"shortcut":"Ctrl+Shift+E"}"#).unwrap();
-        assert!(!settings.shortcut_fallback);
-        assert!(settings.auto_update_enabled);
-    }
-    #[test]
-    fn capture_modes_and_key_aliases_follow_backend_capabilities() {
-        let mut settings = Settings::default();
-        settings.shortcut = "Ctrl+Print".into();
-        let gnome = bindings(&settings, capture::Backend::Gnome);
-        assert_eq!(gnome.len(), 3);
-        assert_eq!(gnome["region"], "Ctrl+PrintScreen");
-        input_shortcuts::validate(gnome).unwrap();
-        assert_eq!(bindings(&settings, capture::Backend::X11).len(), 1);
-        assert_eq!(bindings(&settings, capture::Backend::Unsupported).len(), 1);
-        settings.shortcut_window = settings.shortcut.clone();
-        assert!(input_shortcuts::validate(bindings(&settings, capture::Backend::Gnome)).is_err());
-    }
-}

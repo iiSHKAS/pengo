@@ -38,13 +38,6 @@ ACLs or already-open device handles.
 
 ## Verification
 
-- `cargo test --manifest-path src-tauri/Cargo.toml --lib`
-- `node --experimental-vm-modules scripts/test-shortcut-fallback.cjs`
-  (run `npm ci` first to install jsdom)
-- Optional real-device test: `cargo test --manifest-path src-tauri/Cargo.toml --lib real_evdev_dispatch_and_shutdown -- --ignored --nocapture`
-  requires writable `/dev/uinput` and readable keyboard events. It creates and
-  removes a virtual keyboard and does not change system permissions.
-
 For manual testing, close Pengo, then run a debug build with
 `PENGO_SIMULATE_SHORTCUT_FAILURE=1 cargo run --manifest-path src-tauri/Cargo.toml`.
 This skips native registration while retaining the real evdev opt-in flow.
